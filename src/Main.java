@@ -1,6 +1,5 @@
 import fr.superprof.matrix.Matrix;
 import fr.superprof.pathfinding.Board;
-import fr.superprof.pathfinding.Master;
 
 public class Main {
 
@@ -11,11 +10,9 @@ public class Main {
 
     public static void startPathFindind() {
         System.out.println("PATH FINDING");
-        Master master = Master.getInstance();
-        Board board = new Board(5, 8);
-        master.setBoard(board);
+        Board board = new Board();
         System.out.println(board);
-        master.start();
+        board.play();
         System.out.println(board);
     }
 

@@ -9,12 +9,16 @@ public class Robot implements Moveable {
         cell.setRobot(this);
     }
 
+    public Cell getRelativeCell(Direction direction) {
+        return this.cell.getRelativeCell(direction);
+    }
+
     @Override
     public void moveTo(Direction direction) {
         if (CLEAR_PATH) {
             this.cell.setRobot(null);
         }
-        this.cell = this.cell.getRelativeCell(direction);
+        this.cell = this.getRelativeCell(direction);
         this.cell.setRobot(this);
     }
 

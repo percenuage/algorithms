@@ -5,13 +5,13 @@ public class Cell {
     private Integer col;
     private Type type;
     private Robot robot;
-    private Board board;
+    private AbstractBoard board;
 
-    public Cell(Integer row, Integer col, Board board) {
+    public Cell(Integer row, Integer col, AbstractBoard board) {
         this(row, col, Type.ROAD, board);
     }
 
-    public Cell(Integer row, Integer col, Type type, Board board) {
+    public Cell(Integer row, Integer col, Type type, AbstractBoard board) {
         this.row = row;
         this.col = col;
         this.type = type;
