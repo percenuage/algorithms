@@ -3,7 +3,7 @@ package fr.superprof.pathfinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cell {
+public class Cell extends Node<Cell> {
     private Integer row;
     private Integer col;
     private Type type;
@@ -79,8 +79,13 @@ public class Cell {
     }
 
     @Override
+    protected Integer computeDistance(Cell cell) {
+        return Math.abs(cell.getRow() - this.row) + Math.abs(cell.getCol() - this.col);
+    }
+
+    @Override
     public String toString() {
-        return "@(" + this.row + ":" + this.col + ")";
+        return super.toString() + "@(" + this.row + ":" + this.col + ")";
     }
 
     public Integer getRow() {
