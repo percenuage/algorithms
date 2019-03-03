@@ -1,5 +1,8 @@
 package fr.superprof.pathfinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Cell {
     private Integer row;
     private Integer col;
@@ -31,6 +34,40 @@ public class Cell {
             default:
                 return this;
         }
+    }
+
+    public Direction getDirection(Cell adjacent) {
+        if (!getAdjacents().contains(adjacent)) {
+            throw new IllegalArgumentException("Adjacent arg must be an adjacent cell.");
+        }
+        if (getRelativeCell(Direction.UP).equals(adjacent)) {
+            return Direction.UP;
+        } else if (getRelativeCell(Direction.RIGHT).equals(adjacent)) {
+            return Direction.RIGHT;
+        } else if (getRelativeCell(Direction.DOWN).equals(adjacent)) {
+            return Direction.DOWN;
+        } else if (getRelativeCell(Direction.LEFT).equals(adjacent)) {
+            return Direction.LEFT;
+        } else {
+            return Direction.IDLE;
+        }
+    }
+
+    public List<Cell> getAdjacents() {
+        List<Cell> adj = new ArrayList<>();
+        if (getRelativeCell(Direction.UP).canBeCrossed()) {
+            adj.add(getRelativeCell(Direction.UP));
+        }
+        if (getRelativeCell(Direction.RIGHT).canBeCrossed()) {
+            adj.add(getRelativeCell(Direction.RIGHT));
+        }
+        if (getRelativeCell(Direction.DOWN).canBeCrossed()) {
+            adj.add(getRelativeCell(Direction.DOWN));
+        }
+        if (getRelativeCell(Direction.LEFT).canBeCrossed()) {
+            adj.add(getRelativeCell(Direction.LEFT));
+        }
+        return adj;
     }
 
     public Boolean canBeCrossed() {
