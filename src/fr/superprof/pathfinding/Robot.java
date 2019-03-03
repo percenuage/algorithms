@@ -1,6 +1,7 @@
 package fr.superprof.pathfinding;
 
 public class Robot implements Moveable {
+    public static final Character ASCII = '.';
     private static final Boolean CLEAR_PATH = false;
     private Cell cell;
 
@@ -22,6 +23,10 @@ public class Robot implements Moveable {
         this.cell.setRobot(this);
     }
 
+    public String getAscii() {
+        return ASCII.toString();
+    }
+
     @Override
     public Boolean canMove(Direction direction) {
         return this.cell.getRelativeCell(direction).canBeCrossed();
@@ -29,7 +34,7 @@ public class Robot implements Moveable {
 
     @Override
     public String toString() {
-        return ".";
+        return this.cell.toString();
     }
 
     public Cell getCell() {

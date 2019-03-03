@@ -37,17 +37,17 @@ public class Cell {
         return this.type != Type.BLOCK;
     }
 
+    public String getAscii() {
+        return this.type.toString();
+    }
+
     @Override
     public String toString() {
-        return this.type.toString();
+        return "@(" + this.row + ":" + this.col + ")";
     }
 
     public Integer getRow() {
         return row;
-    }
-
-    public void setRow(Integer row) {
-        this.row = row;
     }
 
     public Integer getCol() {
@@ -65,4 +65,5 @@ public class Cell {
     public Type getType() {
         return type;
     }
+
 }

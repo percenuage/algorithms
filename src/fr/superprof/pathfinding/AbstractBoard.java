@@ -1,5 +1,7 @@
 package fr.superprof.pathfinding;
 
+import java.util.List;
+
 public abstract class AbstractBoard {
     private static final int ROWS = 5;
     private static final int COLS = 8;
@@ -33,7 +35,7 @@ public abstract class AbstractBoard {
         this.rows = rows;
         this.cols = cols;
         this.cells = new Cell[rows][cols];
-        this.init();
+        this.initBoard();
         this.initRobot();
     }
 
@@ -70,7 +72,7 @@ public abstract class AbstractBoard {
         return this.robot.getCell().equals(this.end);
     }
 
-    private final void init() {
+    private final void initBoard() {
         for (int i = 0; i < this.rows; i++) {
             for (int j = 0; j < this.cols; j++) {
                 Type type = Type.fromChar(SHAPE.charAt(this.cols * i + j));
@@ -94,16 +96,23 @@ public abstract class AbstractBoard {
         }
     }
 
-    @Override
-    public String toString() {
+    private String buildBoard(List<Cell> cells) {
         StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        for (int j = 0; j < this.cols; j++) {
+            sb.append("  ").append(j);
+        }
+        sb.append("\n");
         for (int i = 0; i < this.rows; i++) {
+            sb.append(i).append(" ");
             for (int j = 0; j < this.cols; j++) {
                 sb.append("[");
-                if (this.cells[i][j].getRobot() != null && this.cells[i][j].getType() == Type.ROAD) {
-                    sb.append(this.cells[i][j].getRobot());
+                if (cells != null && cells.contains(this.getCells()[i][j])) {
+                    sb.append(Robot.ASCII);
+                } else if (this.cells[i][j].getRobot() != null && this.cells[i][j].getType() == Type.ROAD) {
+                    sb.append(this.cells[i][j].getRobot().getAscii());
                 } else {
-                    sb.append(this.cells[i][j]);
+                    sb.append(this.cells[i][j].getAscii());
                 }
                 sb.append("]");
             }
@@ -111,6 +120,15 @@ public abstract class AbstractBoard {
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
+    }
+
+    public String toStringFromCells(List<Cell> cells) {
+        return buildBoard(cells);
+    }
+
+    @Override
+    public String toString() {
+        return buildBoard(null);
     }
 
     public Integer getRows() {
