@@ -1,11 +1,31 @@
+import fr.superprof.bst.StringBST;
 import fr.superprof.matrix.Matrix;
 import fr.superprof.pathfinding.Board;
 
 public class Main {
 
     public static void main(String[] args) {
-        startPathFindind();
+        startBst();
+//        startPathFindind();
 //        startMatrix();
+    }
+
+    public static void startBst() {
+        System.out.println("BINARY SEARCH TREE");
+        StringBST bst = new StringBST();
+        bst.add("Jang");
+        bst.add("Anna");
+        bst.add("Pol");
+        bst.add("Boris");
+        bst.add("Claudio");
+        bst.add("Pler");
+        bst.add("Marc");
+        bst.add("Mario");
+        bst.add("Sam");
+        bst.setMode(StringBST.PREORDER);
+        System.out.println(bst);
+        bst.remove("Pol");
+        System.out.println(bst);
     }
 
     public static void startPathFindind() {
