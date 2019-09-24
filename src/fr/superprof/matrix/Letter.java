@@ -36,7 +36,8 @@ public class Letter {
 
     @Override
     public boolean equals(Object obj) {
-        return this.getLetter().equals(((Letter) obj).getLetter());
+        Letter letter = (Letter) obj;
+        return this.getLetter().equals(letter.getLetter());
     }
 
     @Override
