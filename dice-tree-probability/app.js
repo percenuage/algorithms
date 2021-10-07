@@ -10,7 +10,6 @@ const generate_all_combinations = (sided = 6, dices) => {
   const combinations = [];
   let roll = Array(dices).fill(1);
   for (let i = 0; i < nb_combination; i++) {
-    // console.log(i + 1, roll);
     combinations.push([...roll]);
     increment_combination(roll, sided);
   }
@@ -33,13 +32,16 @@ const generate_occurrences = combinations => {
     const id = get_poker_combination(count);
     occurrences[id] ? occurrences[id]++ : occurrences[id] = 1;
   })
-
-  occurrences['all'] = _.sum(_.values(occurrences));
+  occurrences['all'] = combinations.length;
   return occurrences;
 }
 
 const get_poker_combination = count => {
   let id = '';
+  if (is_large_straight(count))
+    id += 'large-straight+'
+  else if (is_small_straight(count))
+    id += 'small-straight+'
   _.each(count, (value) => {
     if (value === 2)
       id += 'pair+'
@@ -56,6 +58,12 @@ const get_poker_combination = count => {
   return id.slice(0, -1) || 'NA';
 }
 
+const is_large_straight = count =>
+  [1, 2, 3, 4, 5].every(i => count[i]) || [2, 3, 4, 5, 6].every(i => count[i]);
+
+const is_small_straight = count =>
+  [1, 2, 3, 4].every(i => count[i]) || [2, 3, 4, 5].every(i => count[i]) || [3, 4, 5, 6].every(i => count[i]);
+
 const generate_probabilities = occurrences => {
   const total = occurrences['all'];
   return _.mapValues(occurrences, value => fixed(value / total));
@@ -64,30 +72,28 @@ const generate_probabilities = occurrences => {
 // -------------------
 
 const tree = parent => {
-  if (parent.roll > rolls) return 0;
-  if (is_success_roll(parent.k, parent.n)) {
+  const { k, n, roll } = parent;
+  if (roll > rolls) return 0;
+  if (is_success_roll(k, n)) {
     nodes.push(parent);
     return 0;
-  };
+  }
   const child_nodes = generate_child_nodes(parent);
   _.each(child_nodes, tree)
-  // nodes.push(...child_nodes); // keep only k===3
 }
 
 const generate_child_nodes = parent => {
-  const { k, n, s, roll } = parent;
+  const { k, n, roll } = parent;
   const child_nodes = [];
 
   const child_sided = has_all_sides(k, n) ? sided : 1;
   const start = has_all_sides(k, n) ? 2 : 1;
 
   const fail_node = generate_node(0, n - k, child_sided, roll + 1, parent)
-  // console.log('X', roll, get_node_path(fail_node))
 
   child_nodes.push(fail_node);
   for (let i = start; i <= n - k; i++) {
     const node = generate_node(i, n - k, child_sided, roll + 1, parent);
-    // console.log(i, roll, get_node_path(node))
     child_nodes.push(node);
   }
   return child_nodes;
@@ -166,22 +172,8 @@ const nodes = [];
 
 const root = generate_node(0, dices, sided, 0);
 tree(root);
-print_nodes_by(nodes, get_node_path);
+// print_nodes_by(nodes, get_node_path);
 // print_nodes_by(nodes, get_node_probability);
 
 const tree_probability = calc_tree_probability(nodes);
 console.log(tree_probability, `(${tree_probability * 100} %)`)
-
-// console.log(calc_probability(2, 5, 6))
-// console.log(calc_probability(3, 5, 6))
-// console.log(calc_probability(2, 3, 6))
-// console.log(calc_probability(1, 3, 1))
-// console.log(calc_probability(2, 3, 1))
-// console.log(calc_probability(3, 3, 1))
-// console.log(calc_probability(1, 1, 6))
-// console.log(calc_probability(1, 1, 1))
-
-// console.log(calc_probability(2, 2))
-// console.log(calc_probability(3, 3))
-// console.log(calc_probability(2, 3))
-// console.log(calc_probability(4, 5))
