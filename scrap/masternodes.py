@@ -1,4 +1,3 @@
-import math
 import locale
 import re
 import requests
@@ -68,15 +67,13 @@ def transform():
 
     # Filter DF
     df.dropna(subset = ['Volume'], inplace=True)
-    df.drop(df[df['Volume'] < 1000].index, inplace=True)
-    df.drop(df[df['Nodes'] < 1].index, inplace=True)
-    df.drop(df[df['Cost'] > 1000].index, inplace=True)
-    df.drop(df[df['ROI'] < 20].index, inplace=True)
     df.drop(df[df['Volume'] < 50000].index, inplace=True)
+#     df.drop(df[df['Cost'] > 1000].index, inplace=True)
+#     df.drop(df[df['ROI'] < 20].index, inplace=True)
 
     # Add Earnings columns
-    INITIAL_INVESTMENT = 1000
-    df['Yearly'] = df['ROI'] * INITIAL_INVESTMENT
+    INITIAL_INVESTMENT = 10000
+    df['Yearly'] = (df['ROI'] / 100) * df['Cost'] * np.floor(INITIAL_INVESTMENT / df['Cost'])
     df['Monthly'] = df['Yearly'] / 12
     df['Daily'] = df['Monthly'] / 30.5
 
