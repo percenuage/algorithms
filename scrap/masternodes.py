@@ -69,7 +69,7 @@ def transform():
     df.dropna(subset = ['Volume'], inplace=True)
     df.drop(df[df['Volume'] < 50000].index, inplace=True)
 #     df.drop(df[df['Cost'] > 1000].index, inplace=True)
-#     df.drop(df[df['ROI'] < 20].index, inplace=True)
+    df.drop(df[df['ROI'] < 50].index, inplace=True)
 
     # Add Earnings columns
     INITIAL_INVESTMENT = 10000
