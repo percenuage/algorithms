@@ -1,9 +1,11 @@
+import sys
 import locale
 import re
 import requests
 import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
+from tabulate import tabulate
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -19,6 +21,36 @@ def parse_float(text):
         return float(re.sub('[€,m%]', '', text))
     except ValueError:
         return 'NaN'
+
+def get_dict_coins():
+    URL = f'https://api.coingecko.com/api/v3/coins/list'
+    res = requests.get(URL).json()
+    symbols = list(map(lambda x: x['symbol'], res))
+    ids = list(map(lambda x: x['id'], res))
+    names = list(map(lambda x: x['name'].lower(), res))
+    dict_symbols = dict(zip(symbols, ids))
+    dict_names = dict(zip(names, ids))
+    coins = { **dict_symbols, **dict_names }
+    return coins
+
+def get_markets(coin):
+    coin = coin.lower()
+    match = re.search('(.*) \((.*)\)', coin)
+    name = match.group(1)
+    symbol = match.group(2)
+    if symbol in coins:
+        currency = coins[symbol]
+    elif name in coins:
+        currency = coins[name]
+    else:
+       return 'N/A'
+    URL = f'https://api.coingecko.com/api/v3/coins/{currency}'
+    res = requests.get(URL).json()
+    tickers = res['tickers']
+    markets = map(lambda x: x['market']['name'], tickers)
+    markets = sorted(set(markets))
+    return ','.join(markets)
+
 
 def extract():
     options = webdriver.ChromeOptions()
@@ -72,7 +104,6 @@ def transform():
     df.drop(df[df['ROI'] < 50].index, inplace=True)
 
     # Add Earnings columns
-    INITIAL_INVESTMENT = 10000
     df['Yearly'] = (df['ROI'] / 100) * df['Cost'] * np.floor(INITIAL_INVESTMENT / df['Cost'])
     df['Monthly'] = df['Yearly'] / 12
     df['Daily'] = df['Monthly'] / 30.5
@@ -81,9 +112,7 @@ def transform():
     df['BE'] = (100 * 12) / df['ROI']
 
     # Apply algorithm to find the best
-#     df['Weight'] = (df['ROI'] * df['Volume']) / df['Cost']
     df['Weight'] = (df['ROI'] / df['Cost']) * 100
-#     df['Weight'] = 0
 
     # Sort
     df.sort_values(['ROI'], ascending=(False), inplace=True)
@@ -91,10 +120,30 @@ def transform():
     # Reset index
     df.reset_index(drop=True, inplace=True)
 
-    # Print
-    print(f'> Initial Investment: {INITIAL_INVESTMENT} EUR')
-    print(df.to_string(columns=('Coin', 'Volume', 'ROI', 'Nodes', 'Cost', 'BE', 'Daily', 'Monthly'), float_format=lambda x: locale.format_string('%.0f', x, grouping=True, monetary=True)))
+    # Append Exchange
+    if '-e' in sys.argv:
+        df['Exchange'] = df.apply(lambda x: get_markets(x['Coin']), axis=1)
 
+    # Print
+    print_data(df)
+
+def print_data(df):
+    pd.set_option('display.max_colwidth', -1)
+
+    float_format=lambda x: locale.format_string('%.0f', x, grouping=True, monetary=True)
+    columns=['Coin', 'Volume', 'ROI', 'Nodes', 'Cost', 'BE', 'Daily', 'Monthly']
+
+    if '-e' in sys.argv:
+        columns.append('Exchange')
+
+    df = df[columns]
+
+    print(f'> Initial Investment: {INITIAL_INVESTMENT} EUR')
+#     print(df.to_string(float_format=float_format))
+    print(tabulate(df, headers='keys', tablefmt='github', floatfmt=",.0f"))
+
+INITIAL_INVESTMENT = 10000
+coins = get_dict_coins()
 
 # extract()
 transform()
