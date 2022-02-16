@@ -98,9 +98,10 @@ def transform():
     df = pd.read_csv('masternodes.csv')
 
     # Filter DF
-    df.dropna(subset = ['Volume'], inplace=True)
-    df.drop(df[df['Volume'] < 50000].index, inplace=True)
-#     df.drop(df[df['Cost'] > 1000].index, inplace=True)
+    df.dropna(subset = ['Volume', 'MarketCap'], inplace=True)
+    df.drop(df[df['MarketCap'] < 100000].index, inplace=True)
+#     df.drop(df[df['Volume'] < 50000].index, inplace=True)
+    df.drop(df[df['Cost'] > 20000].index, inplace=True)
     df.drop(df[df['ROI'] < 50].index, inplace=True)
 
     # Add Earnings columns
@@ -131,7 +132,7 @@ def print_data(df):
     pd.set_option('display.max_colwidth', -1)
 
     float_format=lambda x: locale.format_string('%.0f', x, grouping=True, monetary=True)
-    columns=['Coin', 'Volume', 'ROI', 'Nodes', 'Cost', 'BE', 'Daily', 'Monthly']
+    columns=['Coin', 'Volume', 'MarketCap', 'ROI', 'Nodes', 'Cost', 'BE', 'Daily', 'Monthly']
 
     if '-e' in sys.argv:
         columns.append('Exchange')
@@ -145,6 +146,6 @@ def print_data(df):
 INITIAL_INVESTMENT = 10000
 coins = get_dict_coins()
 
-# extract()
+extract()
 transform()
 # load()
